@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1020">
+    <meta name="description" content="TaskFlow — удобный интерфейс для управления задачами.">
+    <title>TaskFlow — управление задачами</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#workspace">Перейти к задачам</a>
+<div class="app-shell">
+    <aside class="sidebar" aria-label="Навигация">
+        <a class="brand" href="/" aria-label="TaskFlow, главная">
+            <span class="brand-mark" aria-hidden="true">✓</span>
+            <span>taskflow</span>
+        </a>
+
+        <nav class="nav-list">
+            <a class="nav-item active" href="#workspace" aria-current="page">
+                <span aria-hidden="true">▦</span> Мои задачи
+            </a>
+            <a class="nav-item" href="/swagger-ui.html" target="_blank" rel="noreferrer">
+                <span aria-hidden="true">⌘</span> API-документация
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span>Все изменения сохраняются</span>
+        </div>
+    </aside>
+
+    <main id="workspace" class="workspace">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Личный рабочий ритм</p>
+                <h1>Задачи</h1>
+            </div>
+            <button id="create-task" class="button button-primary" type="button">
+                <span aria-hidden="true">＋</span> Новая задача
+            </button>
+        </header>
+
+        <section class="metrics" aria-label="Сводка задач">
+            <article class="metric-card accent-violet">
+                <span class="metric-label">Всего задач</span>
+                <strong id="metric-total" class="metric-number">—</strong>
+                <span class="metric-note">по текущему фильтру</span>
+            </article>
+            <article class="metric-card accent-amber">
+                <span class="metric-label">В работе</span>
+                <strong id="metric-progress" class="metric-number">—</strong>
+                <span class="metric-note">на этой странице</span>
+            </article>
+            <article class="metric-card accent-green">
+                <span class="metric-label">Готово</span>
+                <strong id="metric-done" class="metric-number">—</strong>
+                <span class="metric-note">на этой странице</span>
+            </article>
+        </section>
+
+        <section class="task-panel" aria-labelledby="tasks-heading">
+            <div class="panel-toolbar">
+                <div>
+                    <h2 id="tasks-heading">Ваши задачи</h2>
+                    <p id="result-summary" class="subtle-text">Загружаем задачи…</p>
+                </div>
+                <div class="filters" role="search">
+                    <label class="search-field" for="task-search">
+                        <span aria-hidden="true">⌕</span>
+                        <span class="sr-only">Поиск задач</span>
+                        <input id="task-search" type="search" placeholder="Поиск по задачам" autocomplete="off">
+                    </label>
+                    <label class="select-field" for="status-filter">
+                        <span class="sr-only">Статус</span>
+                        <select id="status-filter">
+                            <option value="">Все статусы</option>
+                            <option value="NEW">Новые</option>
+                            <option value="IN_PROGRESS">В работе</option>
+                            <option value="DONE">Готово</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
+
+            <div id="feedback" class="feedback" role="status" aria-live="polite" hidden></div>
+            <div id="task-list" class="task-grid" aria-live="polite" aria-busy="true"></div>
+
+            <div id="empty-state" class="empty-state" hidden>
+                <div class="empty-illustration" aria-hidden="true">✦</div>
+                <h3>Здесь пока спокойно</h3>
+                <p>Добавьте первую задачу — и начните двигаться к результату.</p>
+                <button class="button button-primary" type="button" data-action="create">Создать задачу</button>
+            </div>
+
+            <nav class="pagination" aria-label="Страницы задач">
+                <button id="previous-page" class="button button-quiet" type="button">← Назад</button>
+                <span id="page-indicator" class="page-indicator">Страница —</span>
+                <button id="next-page" class="button button-quiet" type="button">Далее →</button>
+            </nav>
+        </section>
+    </main>
+</div>
+
+<dialog id="task-dialog" class="task-dialog" aria-labelledby="dialog-title">
+    <form id="task-form" method="dialog">
+        <div class="dialog-header">
+            <div>
+                <p id="dialog-kicker" class="eyebrow">Новая задача</p>
+                <h2 id="dialog-title">Сфокусируйтесь на важном</h2>
+            </div>
+            <button id="close-dialog" class="icon-button" type="button" aria-label="Закрыть окно">×</button>
+        </div>
+        <input id="task-id" type="hidden">
+        <label class="form-field" for="task-title">
+            <span>Название <b aria-hidden="true">*</b></span>
+            <input id="task-title" name="title" type="text" maxlength="100" required placeholder="Например, подготовить презентацию" autofocus>
+            <small><span id="title-count">0</span>/100</small>
+        </label>
+        <label class="form-field" for="task-description">
+            <span>Описание <em>необязательно</em></span>
+            <textarea id="task-description" name="description" maxlength="2000" rows="4" placeholder="Добавьте контекст или следующий шаг"></textarea>
+        </label>
+        <label id="status-field" class="form-field" for="task-status" hidden>
+            <span>Статус</span>
+            <select id="task-status" name="status">
+                <option value="NEW">Новая</option>
+                <option value="IN_PROGRESS">В работе</option>
+                <option value="DONE">Готово</option>
+            </select>
+        </label>
+        <p id="form-error" class="form-error" role="alert" hidden></p>
+        <div class="dialog-actions">
+            <button id="cancel-dialog" class="button button-quiet" type="button">Отмена</button>
+            <button id="save-task" class="button button-primary" type="submit">Создать задачу</button>
+        </div>
+    </form>
+</dialog>
+
+<noscript><p class="no-script">Для работы панели нужен JavaScript. REST API и Swagger остаются доступны.</p></noscript>
+<script src="/app.js" defer></script>
+</body>
+</html>

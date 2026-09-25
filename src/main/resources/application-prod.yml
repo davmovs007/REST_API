@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/tasktracker}
+    username: ${DATABASE_USERNAME:tasktracker}
+    password: ${DATABASE_PASSWORD:tasktracker}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      minimum-idle: ${DB_MIN_IDLE:2}
+  h2:
+    console:
+      enabled: false
+
+server:
+  forward-headers-strategy: framework
