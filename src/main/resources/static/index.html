@@ -123,7 +123,7 @@
             <span>Описание <em>необязательно</em></span>
             <textarea id="task-description" name="description" maxlength="2000" rows="4" placeholder="Добавьте контекст или следующий шаг"></textarea>
         </label>
-        <label id="status-field" class="form-field" for="task-status" hidden>
+        <label id="status-field" class="form-field" for="task-status">
             <span>Статус</span>
             <select id="task-status" name="status">
                 <option value="NEW">Новая</option>
@@ -132,6 +132,15 @@
             </select>
         </label>
         <p id="form-error" class="form-error" role="alert" hidden></p>
+        <section id="status-warning" class="status-warning" aria-live="assertive" hidden>
+            <h3>Проверьте выбранный статус</h3>
+            <p id="status-warning-message"></p>
+            <div class="dialog-actions">
+                <button id="create-as-new" class="button button-quiet" type="button">Создать со статусом «Новая»</button>
+                <button id="create-with-selected-status" class="button button-primary" type="button"></button>
+            </div>
+            <button id="back-to-task" class="button button-quiet" type="button">Вернуться к задаче</button>
+        </section>
         <div class="dialog-actions">
             <button id="cancel-dialog" class="button button-quiet" type="button">Отмена</button>
             <button id="save-task" class="button button-primary" type="submit">Создать задачу</button>

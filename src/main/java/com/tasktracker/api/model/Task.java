@@ -38,9 +38,13 @@ public class Task {
     }
 
     public Task(String title, String description) {
+        this(title, description, TaskStatus.NEW);
+    }
+
+    public Task(String title, String description, TaskStatus status) {
         this.title = title;
         this.description = description;
-        this.status = TaskStatus.NEW;
+        this.status = status;
     }
 
     public void update(String title, String description, TaskStatus status) {

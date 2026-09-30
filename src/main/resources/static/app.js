@@ -27,6 +27,12 @@
         description: document.querySelector("#task-description"),
         status: document.querySelector("#task-status"),
         statusField: document.querySelector("#status-field"),
+        statusWarning: document.querySelector("#status-warning"),
+        statusWarningMessage: document.querySelector("#status-warning-message"),
+        createAsNew: document.querySelector("#create-as-new"),
+        createWithSelectedStatus: document.querySelector("#create-with-selected-status"),
+        backToTask: document.querySelector("#back-to-task"),
+        dialogActions: document.querySelector("#task-form > .dialog-actions"),
         kicker: document.querySelector("#dialog-kicker"),
         dialogTitle: document.querySelector("#dialog-title"),
         save: document.querySelector("#save-task"),
@@ -141,7 +147,8 @@
         elements.kicker.textContent = "Новая задача";
         elements.dialogTitle.textContent = "Сфокусируйтесь на важном";
         elements.save.textContent = "Создать задачу";
-        elements.statusField.hidden = true;
+        elements.statusField.hidden = false;
+        hideStatusWarning();
         clearFormError();
         updateTitleCount();
         elements.dialog.showModal();
@@ -159,6 +166,7 @@
         elements.dialogTitle.textContent = "Обновить задачу";
         elements.save.textContent = "Сохранить изменения";
         elements.statusField.hidden = false;
+        hideStatusWarning();
         clearFormError();
         updateTitleCount();
         elements.dialog.showModal();
@@ -170,16 +178,29 @@
         clearFormError();
         if (!elements.form.reportValidity()) return;
         const editingId = elements.taskId.value;
+        if (!editingId && elements.status.value !== "NEW") {
+            showStatusWarning();
+            return;
+        }
+        await submitTask(editingId, editingId ? elements.status.value : "NEW");
+    }
+
+    async function submitTask(editingId, createStatus) {
         const payload = { title: elements.title.value.trim(), description: elements.description.value.trim() || null };
         if (editingId) payload.status = elements.status.value;
+        else payload.status = createStatus;
 
         elements.save.disabled = true;
+        elements.createAsNew.disabled = true;
+        elements.createWithSelectedStatus.disabled = true;
+        elements.backToTask.disabled = true;
         elements.save.textContent = editingId ? "Сохраняем…" : "Создаём…";
         try {
             await api(editingId ? `${API}/${editingId}` : API, {
                 method: editingId ? "PUT" : "POST",
                 body: JSON.stringify(payload)
             });
+            hideStatusWarning();
             elements.dialog.close();
             announce(editingId ? "Задача обновлена." : "Задача создана.");
             await loadTasks();
@@ -188,8 +209,26 @@
             elements.formError.hidden = false;
         } finally {
             elements.save.disabled = false;
+            elements.createAsNew.disabled = false;
+            elements.createWithSelectedStatus.disabled = false;
+            elements.backToTask.disabled = false;
             elements.save.textContent = editingId ? "Сохранить изменения" : "Создать задачу";
         }
+    }
+
+    function showStatusWarning() {
+        const selectedStatus = elements.status.value;
+        elements.statusWarningMessage.textContent =
+            `Эта задача ещё не добавлена в список, поэтому статус «${labels[selectedStatus]}» может ей не соответствовать.`;
+        elements.createWithSelectedStatus.textContent = `Создать со статусом «${labels[selectedStatus]}»`;
+        elements.statusWarning.hidden = false;
+        elements.dialogActions.hidden = true;
+        elements.createAsNew.focus();
+    }
+
+    function hideStatusWarning() {
+        elements.statusWarning.hidden = true;
+        elements.dialogActions.hidden = false;
     }
 
     async function deleteTask(id) {
@@ -219,6 +258,12 @@
     document.querySelector("#close-dialog").addEventListener("click", () => elements.dialog.close());
     document.querySelector("#cancel-dialog").addEventListener("click", () => elements.dialog.close());
     elements.form.addEventListener("submit", saveTask);
+    elements.status.addEventListener("change", () => {
+        if (!elements.statusWarning.hidden) showStatusWarning();
+    });
+    elements.createWithSelectedStatus.addEventListener("click", () => submitTask("", elements.status.value));
+    elements.createAsNew.addEventListener("click", () => submitTask("", "NEW"));
+    elements.backToTask.addEventListener("click", hideStatusWarning);
     elements.title.addEventListener("input", updateTitleCount);
     elements.filter.addEventListener("change", () => { state.status = elements.filter.value; state.page = 0; loadTasks(); });
     elements.search.addEventListener("input", () => {

@@ -98,6 +98,27 @@ class TaskControllerIntegrationTest {
     }
 
     @Test
+    void createsTaskWithSelectedStatusAndDefaultsStatusWhenOmitted() throws Exception {
+        mockMvc.perform(post("/api/v1/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Already completed\",\"status\":\"DONE\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("DONE"));
+
+        mockMvc.perform(post("/api/v1/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Just started\",\"status\":\"IN_PROGRESS\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
+
+        mockMvc.perform(post("/api/v1/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"title\":\"Default status\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("NEW"));
+    }
+
+    @Test
     void returnsProblemDetailsForInvalidAndMissingTasks() throws Exception {
         mockMvc.perform(post("/api/v1/tasks")
                         .contentType(MediaType.APPLICATION_JSON)

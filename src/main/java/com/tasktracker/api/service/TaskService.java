@@ -32,7 +32,8 @@ public class TaskService {
 
     @Transactional
     public TaskResponse create(CreateTaskRequest request) {
-        Task task = new Task(normalizeRequired(request.title()), normalizeDescription(request.description()));
+        TaskStatus status = request.status() == null ? TaskStatus.NEW : request.status();
+        Task task = new Task(normalizeRequired(request.title()), normalizeDescription(request.description()), status);
         return TaskResponse.from(taskRepository.save(task));
     }
 
