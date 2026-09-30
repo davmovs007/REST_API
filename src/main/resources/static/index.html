@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#0b1020">
     <meta name="description" content="TaskFlow — удобный интерфейс для управления задачами.">
     <title>TaskFlow — управление задачами</title>
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/styles.css?v=4">
 </head>
 <body>
 <a class="skip-link" href="#workspace">Перейти к задачам</a>
@@ -135,11 +135,11 @@
         <section id="status-warning" class="status-warning" aria-live="assertive" hidden>
             <h3>Проверьте выбранный статус</h3>
             <p id="status-warning-message"></p>
-            <div class="dialog-actions">
-                <button id="create-as-new" class="button button-quiet" type="button">Создать со статусом «Новая»</button>
+            <div class="dialog-actions status-actions">
                 <button id="create-with-selected-status" class="button button-primary" type="button"></button>
+                <button id="create-as-new" class="button button-quiet" type="button">Создать как «Новая»</button>
+                <button id="back-to-task" class="button button-quiet" type="button">Вернуться к задаче</button>
             </div>
-            <button id="back-to-task" class="button button-quiet" type="button">Вернуться к задаче</button>
         </section>
         <div class="dialog-actions">
             <button id="cancel-dialog" class="button button-quiet" type="button">Отмена</button>
@@ -149,6 +149,6 @@
 </dialog>
 
 <noscript><p class="no-script">Для работы панели нужен JavaScript. REST API и Swagger остаются доступны.</p></noscript>
-<script src="/app.js" defer></script>
+<script src="/app.js?v=4" defer></script>
 </body>
 </html>

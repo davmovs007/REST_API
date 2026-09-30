@@ -220,7 +220,7 @@
         const selectedStatus = elements.status.value;
         elements.statusWarningMessage.textContent =
             `Эта задача ещё не добавлена в список, поэтому статус «${labels[selectedStatus]}» может ей не соответствовать.`;
-        elements.createWithSelectedStatus.textContent = `Создать со статусом «${labels[selectedStatus]}»`;
+        elements.createWithSelectedStatus.textContent = `Создать как «${labels[selectedStatus]}»`;
         elements.statusWarning.hidden = false;
         elements.dialogActions.hidden = true;
         elements.createAsNew.focus();
@@ -259,10 +259,19 @@
     document.querySelector("#cancel-dialog").addEventListener("click", () => elements.dialog.close());
     elements.form.addEventListener("submit", saveTask);
     elements.status.addEventListener("change", () => {
-        if (!elements.statusWarning.hidden) showStatusWarning();
+        const editingId = elements.taskId.value;
+        if (!editingId && elements.status.value !== "NEW") {
+            showStatusWarning();
+        } else {
+            hideStatusWarning();
+        }
     });
-    elements.createWithSelectedStatus.addEventListener("click", () => submitTask("", elements.status.value));
-    elements.createAsNew.addEventListener("click", () => submitTask("", "NEW"));
+    elements.createWithSelectedStatus.addEventListener("click", () => {
+        if (elements.form.reportValidity()) submitTask("", elements.status.value);
+    });
+    elements.createAsNew.addEventListener("click", () => {
+        if (elements.form.reportValidity()) submitTask("", "NEW");
+    });
     elements.backToTask.addEventListener("click", hideStatusWarning);
     elements.title.addEventListener("input", updateTitleCount);
     elements.filter.addEventListener("change", () => { state.status = elements.filter.value; state.page = 0; loadTasks(); });
